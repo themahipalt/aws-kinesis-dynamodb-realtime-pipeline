@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda Function for TELEMAX real-time pipeline
+
+Resources:
+  TelемaxLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: kinesis-to-dynamodb
+      Runtime: python3.12
+      Handler: lambda_function.lambda_handler
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/kinesis-lambda-dynamodb-role
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import base64
+          import uuid
+          from decimal import Decimal
+          dynamodb = boto3.resource('dynamodb')
+          table = dynamodb.Table('telemax-data')
+          def lambda_handler(event, context):
+              for record in event['Records']:
+                  payload = base64.b64decode(record['kinesis']['data']).decode('utf-8')
+                  data = json.loads(payload, parse_float=Decimal)
+                  data['record_id'] = str(uuid.uuid4())
+                  table.put_item(Item=data)
+              return {'statusCode': 200, 'body': 'Success'}
+      Timeout: 30
+      MemorySize: 128
+      Tags:
+        - Key: Project
+          Value: TELEMAX
+
+  KinesisEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !Sub arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/telemax-stream
+      FunctionName: !GetAtt TelемaxLambdaFunction.Arn
+      StartingPosition: LATEST
+      BatchSize: 100
+      Enabled: true

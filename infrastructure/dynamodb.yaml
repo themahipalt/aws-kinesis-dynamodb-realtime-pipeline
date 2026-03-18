@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: DynamoDB Table for TELEMAX real-time pipeline
+
+Resources:
+  TelемaxDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: telemax-data
+      AttributeDefinitions:
+        - AttributeName: record_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: record_id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: Project
+          Value: TELEMAX
+        - Key: Environment
+          Value: Dev
+
+Outputs:
+  TableName:
+    Description: Name of the DynamoDB Table
+    Value: !Ref TelемaxDynamoDBTable
+  TableARN:
+    Description: ARN of the DynamoDB Table
+    Value: !GetAtt TelемaxDynamoDBTable.Arn

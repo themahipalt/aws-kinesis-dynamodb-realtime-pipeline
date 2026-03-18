@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Kinesis Data Stream for TELEMAX real-time pipeline
+
+Resources:
+  TelемaxKinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: telemax-stream
+      ShardCount: 1
+      RetentionPeriodHours: 24
+      Tags:
+        - Key: Project
+          Value: TELEMAX
+        - Key: Environment
+          Value: Dev
+
+Outputs:
+  StreamName:
+    Description: Name of the Kinesis Stream
+    Value: !Ref TelемaxKinesisStream
+  StreamARN:
+    Description: ARN of the Kinesis Stream
+    Value: !GetAtt TelемaxKinesisStream.Arn
