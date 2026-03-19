@@ -1,40 +1,114 @@
-# AWS Kinesis → DynamoDB Real-Time Pipeline
+# TELEMAX — AWS Real-Time Data Pipeline
 
-## Project Overview
-Real-time data pipeline built for TELEMAX using:
-- **Amazon Kinesis Data Streams** — real-time data ingestion
-- **AWS Lambda** — serverless event processing
-- **Amazon DynamoDB** — NoSQL data storage
+A real-time data pipeline built on AWS for TELEMAX, a telecom company building
+networks in underserved markets. Network tower data is captured, processed, and
+stored automatically using serverless AWS services.
+
+---
 
 ## Architecture
+
+![Architecture](architecture/architecture-diagram.png)
+
 ```
-[Producer] → [Kinesis Stream] → [Lambda] → [DynamoDB]
+Producer (producer.py) → Kinesis Stream → Lambda Function → DynamoDB
 ```
+
+---
+
+## Services Used
+
+| Service | Resource | Purpose |
+|---|---|---|
+| Amazon Kinesis | telemax-stream | Ingest real-time data |
+| AWS Lambda | kinesis-to-dynamodb | Process and store records |
+| Amazon DynamoDB | telemax-data | NoSQL storage |
+| AWS IAM | kinesis-lambda-dynamodb-role | Permissions |
+| AWS CloudFormation | 4 stacks | Deploy all infrastructure |
+| Amazon CloudWatch | Lambda log group | Monitoring and logs |
+
+---
 
 ## Folder Structure
+
 ```
 aws-kinesis-dynamodb-realtime-pipeline/
-├── producer/producer.py          # Sends data to Kinesis
-├── lambda/lambda_function.py     # Processes and saves to DynamoDB
-├── infrastructure/               # CloudFormation YAML templates
-├── screenshots/                  # AWS Console screenshots
-├── architecture/                 # Architecture diagram
-└── docs/project-explanation.md   # Detailed documentation
+├── producer/
+│   └── producer.py
+├── lambda/
+│   └── lambda_function.py
+├── infrastructure/
+│   ├── iam-role.yaml
+│   ├── kinesis-stream.yaml
+│   ├── dynamodb.yaml
+│   └── lambda.yaml
+├── architecture/
+│   └── architecture-diagram.png
+├── screenshots/
+│   ├── kinesis-stream.png
+│   ├── dynamodb-table.png
+│   └── lambda-trigger.png
+└── docs/
+    └── project-explanation.md
 ```
 
-## Setup Steps
-1. Create IAM Role with Kinesis, DynamoDB, CloudWatch permissions
-2. Create Kinesis Data Stream — `telemax-stream`
-3. Create DynamoDB Table — `telemax-data`
-4. Deploy Lambda Function — `kinesis-to-dynamodb`
-5. Add Kinesis trigger to Lambda
-6. Run producer script to send test data
-7. Verify records in DynamoDB
+---
 
-## Requirements
-- Python 3.12
-- boto3
-- AWS Account with appropriate permissions
+## How to Run
 
-## Author
-TELEMAX Infrastructure Team
+### 1. Install dependencies
+
+```bash
+pip install boto3
+aws configure
+```
+
+### 2. Deploy infrastructure
+
+```bash
+aws cloudformation deploy --template-file infrastructure/iam-role.yaml --stack-name telemax-iam --capabilities CAPABILITY_NAMED_IAM
+
+aws cloudformation deploy --template-file infrastructure/kinesis-stream.yaml --stack-name telemax-kinesis
+
+aws cloudformation deploy --template-file infrastructure/dynamodb.yaml --stack-name telemax-dynamodb
+
+aws cloudformation deploy --template-file infrastructure/lambda.yaml --stack-name telemax-lambda
+```
+
+### 3. Send data
+
+```bash
+cd producer
+python3 producer.py
+```
+
+### 4. Verify in DynamoDB
+
+Go to AWS Console → DynamoDB → telemax-data → Explore table items → Run
+
+---
+
+## Data Schema
+
+| Field | Type | Description |
+|---|---|---|
+| record_id | String | Unique ID (UUID) |
+| device_id | String | Tower name e.g. tower-7 |
+| signal_strength | Decimal | Signal in dBm |
+| bandwidth_mbps | Decimal | Bandwidth in Mbps |
+| location | String | City name |
+| timestamp | String | Unix timestamp |
+
+---
+
+## IAM Permissions Required
+
+- AmazonKinesisFullAccess
+- AmazonDynamoDBFullAccess
+- CloudWatchLogsFullAccess
+
+---
+
+## Docs
+
+See [docs/project-explanation.md](docs/project-explanation.md) for full details.
