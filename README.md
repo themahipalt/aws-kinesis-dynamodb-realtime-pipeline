@@ -8,12 +8,12 @@ stored automatically using serverless AWS services.
 
 ## Architecture
 
-![Architecture](architecture/architecture-diagram.png)
+![Architecture](docs/architecture-diagram.png)
 
 ```
 Producer (producer.py) → Kinesis Stream → Lambda Function → DynamoDB
 ```
-
+https://themahipalt.github.io/aws-kinesis-dynamodb-realtime-pipeline/telemax-architecture.html
 ---
 
 ## Services Used
