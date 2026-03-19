@@ -8,7 +8,7 @@ stored automatically using serverless AWS services.
 
 ## Architecture
 
-![Architecture](docs/architecture-diagram.png.)
+![Architecture](docs/architecture-diagram.png)
 
 ```
 Producer (producer.py) → Kinesis Stream → Lambda Function → DynamoDB
