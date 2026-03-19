@@ -1,43 +1,47 @@
-
-### Folder Structure
-~~~
-aws-kinesis-dynamodb-realtime-pipeline
-│
-├── README.md
-├── architecture
-│     └── architecture-diagram.png
-│
-├── producer
-│     └── producer.py
-│
-├── lambda
-│     └── lambda_function.py
-│
-├── infrastructure
-│     ├── kinesis-stream.yaml
-│     ├── lambda.yaml
-│     └── dynamodb.yaml
-│
-├── screenshots
-│     ├── kinesis-stream.png
-│     ├── dynamodb-table.png
-│     ├── lambda-trigger.png
-│
-└── docs
-      └── project-explanation.md
-~~~
-
-
 # TELEMAX Real-Time Data Pipeline — Project Explanation
 
 ## Overview
+
 This project implements a real-time data pipeline on AWS for TELEMAX,
 a telecommunications company building networks in underserved markets.
 
+---
+
+## Folder Structure
+
+```
+aws-kinesis-dynamodb-realtime-pipeline
+├── README.md
+├── architecture
+│     └── architecture-diagram.png
+├── producer
+│     └── producer.py
+├── lambda
+│     └── lambda_function.py
+├── infrastructure
+│     ├── iam-role.yaml
+│     ├── kinesis-stream.yaml
+│     ├── lambda.yaml
+│     └── dynamodb.yaml
+├── screenshots
+│     ├── kinesis-stream.png
+│     ├── dynamodb-table.png
+│     └── lambda-trigger.png
+└── docs
+      └── project-explanation.md
+```
+
+---
+
 ## Architecture
+
 Data flows through 3 main AWS services:
 
+```
 Producer → Kinesis Data Stream → Lambda Function → DynamoDB
+```
+
+---
 
 ## Components
 
@@ -57,31 +61,40 @@ Producer → Kinesis Data Stream → Lambda Function → DynamoDB
 - Partition key: record_id (unique UUID per record)
 - Pay-per-request billing — scales automatically
 
+---
+
 ## Data Schema
-Each record contains:
-| Field            | Type    | Description                        |
-|------------------|---------|------------------------------------|
-| record_id        | String  | Unique identifier (UUID)           |
-| device_id        | String  | Tower identifier e.g. tower-23     |
-| signal_strength  | Number  | Signal in dBm (-100 to 0)          |
-| bandwidth_mbps   | Decimal | Bandwidth in Mbps                  |
-| location         | String  | City name                          |
-| timestamp        | String  | Unix timestamp of the record       |
+
+| Field | Type | Description |
+|---|---|---|
+| record_id | String | Unique identifier (UUID) |
+| device_id | String | Tower identifier e.g. tower-23 |
+| signal_strength | Number | Signal in dBm (-100 to 0) |
+| bandwidth_mbps | Decimal | Bandwidth in Mbps |
+| location | String | City name |
+| timestamp | String | Unix timestamp of the record |
+
+---
 
 ## How to Run
 
 ### Step 1 — Send data to Kinesis
+
 ```bash
 cd producer
 python3 producer.py
 ```
 
 ### Step 2 — Verify in DynamoDB
+
 - Go to AWS Console → DynamoDB → telemax-data
 - Click Explore table items
 - Click Run to see all records
 
+---
+
 ## IAM Permissions Required
+
 - AmazonKinesisFullAccess
 - AmazonDynamoDBFullAccess
 - CloudWatchLogsFullAccess
